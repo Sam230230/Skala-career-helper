@@ -95,23 +95,47 @@ review  = crew.hr_fit_review_task().output.pydantic         # HRFitReview
 
 ---
 
-## 5. 다음 단계 (백엔드/프론트 연결)
+## 5. 웹 앱 실행 (백엔드 + 프론트엔드)
 
-`crew.py` 의 `run_single()` / `run_batch()` 가 그대로 API 엔드포인트가 됩니다. 예 (FastAPI):
+`api/`(FastAPI)와 `web/`(React·Vite)이 구현되어 있습니다.
+백엔드는 `crew.py` 를 그대로 감싸고, 프론트는 SK 아이덴티티 UI로 입력·리포트를 렌더합니다.
+**터미널 2개**를 동시에 띄웁니다.
 
-```python
-from fastapi import FastAPI
-from crew import run_single
-
-app = FastAPI()
-
-@app.post("/consult")
-def consult(payload: dict):
-    result = run_single(payload)
-    return {"report_markdown": result.raw}
+### ① 백엔드 (FastAPI) — 포트 8001
+```powershell
+# 레포 루트(skala_career_helper)에서, venv 활성화 상태
+cd C:\Users\pds20\Desktop\llm_code\skala_career_helper
+..\.venv\Scripts\Activate.ps1          # 이미 활성화됐으면 생략
+python -m uvicorn api.main:app --reload --port 8001
 ```
+→ `Uvicorn running on http://127.0.0.1:8001` 이 뜨면 성공.
+- API 문서(Swagger): http://localhost:8001/docs
+- 엔드포인트: `POST /consult`(단건), `POST /consult/batch`(배치), `GET /health`
 
-프론트는 입력 폼(자소서/이력서/포폴/희망직무) → `POST /consult` → 마크다운 렌더링 순으로 붙이면 됩니다.
+### ② 프론트엔드 (React + Vite) — 포트 5173
+```powershell
+# 새 터미널에서
+cd C:\Users\pds20\Desktop\llm_code\skala_career_helper\web
+npm install     # 최초 1회
+npm run dev
+```
+→ 브라우저에서 **http://localhost:5173** 접속 → "샘플 채우기" → "컨설팅 리포트 생성".
+
+> ⚠️ 포트 주의: 프론트(`web/vite.config.js`)의 프록시가 **백엔드 8001** 을 바라봅니다.
+> 백엔드를 다른 포트로 띄우려면 `vite.config.js` 의 `proxy` 값도 함께 바꿔야 합니다.
+> 프론트에서 `http proxy error ... ECONNREFUSED` 가 나면 **백엔드가 8001에 안 떠 있는 것**입니다.
+
+### 응답 형태
+```jsonc
+POST /consult  →
+{
+  "trainee_id": "...", "trainee_name": "...",
+  "report_markdown": "# SKALA 취업 컨설팅 브리핑 ...",  // 프론트가 렌더하는 최종 리포트
+  "profile":   { ... },   // ApplicantProfile (서류 분석)
+  "market":    { ... },   // JobMarketReport (채용시장)
+  "hr_review": { ... }    // HRFitReview (적합도·질문)
+}
+```
 
 ---
 
@@ -123,4 +147,6 @@ def consult(payload: dict):
 | `KeyError` (태스크 실행 중) | tasks.yaml 본문에 `{}` 중괄호 사용 금지 (placeholder 외). 스키마는 코드의 `output_pydantic` 로만 강제 |
 | `config/agents.yaml not found` | `crew.py` 와 같은 폴더에 `config/` 가 있어야 함 |
 | job_trend 결과가 '데이터 확인 불가' 뿐 | `SERPER_API_KEY` 미설정 (정상). 실검색이 필요하면 키 등록 |
+| 프론트 `http proxy error ... ECONNREFUSED` | 백엔드가 8001에 안 떠 있음 → 백엔드 터미널을 8001로 실행 |
+| `error while attempting to bind ... 8000/8001` | 포트를 이미 쓰는 중. 점유 프로세스 종료 또는 다른 포트 사용(+`vite.config.js` 프록시도 변경) |
 | rate limit / 비용 | 배치 규모를 줄이거나 모델을 `gpt-4o-mini` 로 유지 |
