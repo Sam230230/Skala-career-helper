@@ -5,3 +5,7 @@ crewai[openai]>=1.15,<2.0     # CrewAI + OpenAI LLM 연동
 crewai-tools>=0.25            # SerperDevTool / ScrapeWebsiteTool (실시간 채용 검색, 선택)
 python-dotenv>=1.0            # .env 로드
 pydantic>=2.0                # 구조화 출력 스키마
+
+# --- 백엔드 API ---
+fastapi>=0.115              # REST API 프레임워크
+uvicorn[standard]>=0.30     # ASGI 서버

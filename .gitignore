@@ -27,6 +27,12 @@ output/
 .crewai/
 crewai_traces/
 
+# ===== 프론트엔드 (web/) =====
+node_modules/
+web/dist/
+web/.vite/
+npm-debug.log*
+
 # ===== IDE / OS =====
 .vscode/
 .idea/
