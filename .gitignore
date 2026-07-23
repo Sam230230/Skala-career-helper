@@ -1,0 +1,34 @@
+# ===== 비밀정보 (절대 커밋 금지) =====
+.env
+.env.*
+!.env.example
+*.key
+secrets.*
+
+# ===== 파이썬 =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== 가상환경 =====
+.venv/
+venv/
+env/
+llm/
+
+# ===== 실행 산출물 (교육생 리포트 - 개인정보 포함 가능) =====
+output/
+
+# ===== CrewAI / 로그 =====
+*.log
+.crewai/
+crewai_traces/
+
+# ===== IDE / OS =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

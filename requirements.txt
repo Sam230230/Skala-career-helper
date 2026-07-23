@@ -1,0 +1,7 @@
+# SKALA Career Helper - 실행 의존성
+# 설치:  pip install -r requirements.txt
+
+crewai[openai]>=1.15,<2.0     # CrewAI + OpenAI LLM 연동
+crewai-tools>=0.25            # SerperDevTool / ScrapeWebsiteTool (실시간 채용 검색, 선택)
+python-dotenv>=1.0            # .env 로드
+pydantic>=2.0                # 구조화 출력 스키마
